@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Water Tank Problem</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <main class="container">
+    <h1>Water Tank Problem</h1>
+
+    <p>
+      Enter block heights and calculate how many units of water are trapped
+      between them. This is a classic algorithm problem!
+    </p>
+
+    <section class="panel">
+      <label for="heights">Input heights (as array)</label>
+      <div class="row">
+        <input id="heights" type="text" value="[0,4,0,0,0,6,0,6,4,0]" />
+        <button id="solveBtn" type="button">Calculate</button>
+      </div>
+      <p class="help">Example: [0,4,0,0,0,6,0,6,4,0] - try different values!</p>
+    </section>
+
+    <section class="panel">
+      <h2>Results</h2>
+      <p><strong>Input:</strong> <span id="inputEcho"></span></p>
+      <p><strong>Total trapped water:</strong> <span id="totalWater"></span></p>
+      <p><strong>Water by position:</strong> <span id="columnWater"></span></p>
+      <p id="errorMessage" class="error" hidden></p>
+    </section>
+
+    <section class="panel">
+      <h2>Visualization</h2>
+      <div id="chart" class="chart"></div>
+      <div id="legend" class="legend">
+        <span><i class="box block"></i> Block</span>
+        <span><i class="box water"></i> Water</span>
+        <span><i class="box empty"></i> Empty</span>
+      </div>
+    </section>
+  </main>
+
+  <script src="./script.js"></script>
+</body>
+
+</html>

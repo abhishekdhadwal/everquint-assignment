@@ -1,0 +1,11 @@
+// This file is used by Sequelize CLI to locate standard directories
+// and the configuration file. It allows us to use a dynamic .cjs 
+// configuration file instead of a static .json file.
+const path = require('path');
+
+module.exports = {
+  'config': path.resolve('config', 'config.cjs'), // Path to dynamic config
+  'models-path': path.resolve('models'),
+  'seeders-path': path.resolve('seeders'),
+  'migrations-path': path.resolve('migrations')
+};
