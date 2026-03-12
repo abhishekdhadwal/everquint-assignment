@@ -1,6 +1,16 @@
 # Meeting Room Booking Service
 
-Backend assignment implementation using `Express + Sequelize + PostgreSQL`.
+Backend assignment implementation using `Express`, `Sequelize`, and `PostgreSQL`.
+
+## What Is Included
+
+- PostgreSQL-backed persistence
+- Sequelize models
+- standard Sequelize CLI migrations
+- REST API for rooms, bookings, cancellation, and utilization report
+- Swagger docs at `/api-docs`
+- Jest + Supertest API tests
+- `README.md` and `DESIGN.md`
 
 ## Environment
 
@@ -20,9 +30,22 @@ PORT=3000
 DATABASE_URL=postgres://postgres:Admin123@localhost:5432/meeting_room_booking
 ```
 
+## Project Structure
+
+- `server.js`: app entrypoint
+- `config/database.js`: Sequelize database connection
+- `config/config.cjs`: Sequelize CLI config
+- `.sequelizerc`: Sequelize CLI path mapping
+- `models/`: Sequelize models and associations
+- `migrations/`: schema migrations
+- `controllers/`, `services/`, `repositories/`: request, business, and data layers
+- `tests/`: integration/API tests
+
 ## Endpoints
 
 ### `POST /rooms`
+
+Request body:
 
 ```json
 {
@@ -46,6 +69,8 @@ Optional header:
 
 - `Idempotency-Key`
 
+Request body:
+
 ```json
 {
   "roomId": 1,
@@ -55,6 +80,13 @@ Optional header:
   "endTime": "2026-03-16T10:00:00Z"
 }
 ```
+
+Rules enforced:
+
+- `startTime < endTime`
+- booking duration between 15 minutes and 4 hours
+- Monday-Friday, 08:00-20:00 in the supplied local time
+- no overlapping confirmed bookings for the same room
 
 ### `GET /bookings`
 
@@ -68,6 +100,9 @@ Optional query params:
 
 ### `POST /bookings/:id/cancel`
 
+- cancellation allowed until 1 hour before `startTime`
+- re-cancelling an already cancelled booking returns the cancelled booking
+
 ### `GET /reports/room-utilization`
 
 Required query params:
@@ -80,7 +115,6 @@ Required query params:
 ```bash
 npm install
 npm run db:migrate
-npm test
 npm start
 ```
 
@@ -88,9 +122,21 @@ Swagger UI:
 
 - `http://localhost:3000/api-docs`
 
+## Test
+
+```bash
+npm test
+```
+
+Current test flow:
+
+1. reset the test database tables
+2. run Sequelize migrations
+3. run Jest API tests
+
 ## Notes
 
 - schema is managed through migration files in `migrations/`
-- use `npm run db:migrate` before starting the app
-- tests run against PostgreSQL and truncate tables between cases
-- design decisions are documented in `DESIGN.md`
+- `server.js` is the only runtime entrypoint
+- tests run against PostgreSQL, not an in-memory substitute
+- design details and tradeoffs are documented in `DESIGN.md`
