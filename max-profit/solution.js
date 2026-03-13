@@ -1,4 +1,11 @@
 // Max profit problem - need to figure out optimal building strategy
+// Approach Used: Backtracking / Exhaustive Search
+// 1. We recursively try all possible combinations of T, P, and C buildings.
+// 2. We keep track of the current day, accumulated profit, and current building count.
+// 3. For each building type, if we have enough days left to build it, we calculate its profit
+//    for the remaining days, recursively test the next buildings, and then backtrack 
+//    (remove the building) to try other combinations.
+// 4. We record and return the combination that yields the maximum total profit.
 function maxProfit(days) {
   // Building types with their stats
   const buildingTypes = [

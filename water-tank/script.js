@@ -29,6 +29,12 @@ function parseInput(inputValue) {
 }
 
 // Main algorithm - calculate trapped water using left/right max approach
+// Approach Used: Precomputed Left/Right Maximums (Dynamic Programming approach)
+// 1. Iterate from left to right to precompute the maximum height to the left of each element.
+// 2. Iterate from right to left to precompute the maximum height to the right of each element.
+// 3. The water trapped at any index is the minimum of the maximum heights on its left and right, 
+//    minus the height of the block at that index. This avoids O(n^2) repeated scans and achieves 
+//    O(n) time complexity and O(n) space complexity.
 function calculateTrappedWater(heights) {
   const n = heights.length;
 
