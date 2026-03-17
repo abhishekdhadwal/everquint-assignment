@@ -1,77 +1,87 @@
-// So basically what we are doing here is, we have 3 types of buildings only.
-// Each building is taking some days to construct and after that it is giving money on daily basis.
-// We have to find out which buildings to build and in what order so that total earning is maximum.
+// Basically we have 3 types of buildings - Theatre (T), Pub (P), Commercial Park (C)
+// Each one takes some days to build and then starts earning daily
+// We need to find which buildings to construct to get maximum earnings
 //
-// First I was trying backtracking only but that was becoming very slow for large inputs
-// and also not giving correct answer always. So I have used Dynamic Programming approach here.
-//
-// Main logic is this — instead of tracking current day, we are tracking total days spent in construction.
-// dp[t] means what is the best profit we can get if t days are spent on construction total.
-// Whatever building finishes on day t, it will earn money for remaining (totalDays - t) days only.
+// Using Dynamic Programming here because backtracking was too slow
+// dp[t] = maximum earnings possible when we've spent exactly t days building
+// When a building finishes on day t, it earns for the remaining (totalDays - t) days
 
 function maxProfit(days) {
-  const buildingTypes = [
+  const buildings = [
     { type: "T", buildTime: 5, dailyEarning: 1500 },
     { type: "P", buildTime: 4, dailyEarning: 1000 },
     { type: "C", buildTime: 10, dailyEarning: 2000 },
   ];
 
-  // dp[t] = max profit achievable by spending exactly t days on construction
+  // dp[t] stores max earnings when t days spent on construction
   const dp = new Array(days + 1).fill(0);
 
-  // keeping track of choices so we can reconstruct which buildings were picked
-  const from = new Array(days + 1).fill(null);
+  // track all possible ways to reach each state with max earnings
+  const paths = new Array(days + 1).fill(null).map(() => []);
 
   for (let t = 1; t <= days; t++) {
-    for (const b of buildingTypes) {
+    for (const b of buildings) {
       if (t < b.buildTime) continue;
 
       const prevT = t - b.buildTime;
-      // this building finishes on day t, so it earns for the remaining days
       const earnings = dp[prevT] + (days - t) * b.dailyEarning;
 
       if (earnings > dp[t]) {
+        // found better solution, reset paths
         dp[t] = earnings;
-        from[t] = { prevT, building: b };
+        paths[t] = [{ prevT, building: b }];
+      } else if (earnings === dp[t] && dp[t] > 0) {
+        // found another way to get same max earnings
+        paths[t].push({ prevT, building: b });
       }
     }
   }
 
-  // the answer isn't necessarily at dp[days] — we might not want to fill every day
-  // e.g. starting a building on the last day earns nothing, so we skip it
-  let bestT = 0;
-  for (let t = 1; t <= days; t++) {
-    if (dp[t] > dp[bestT]) bestT = t;
+  // find maximum earnings across all possible construction times
+  let maxEarnings = 0;
+  for (let t = 0; t <= days; t++) {
+    maxEarnings = Math.max(maxEarnings, dp[t]);
   }
 
-  // walk back through our choices to count how many of each building we built
-  const buildingCount = { T: 0, P: 0, C: 0 };
-  let cur = bestT;
-  while (from[cur] !== null) {
-    const { prevT, building } = from[cur];
-    buildingCount[building.type]++;
-    cur = prevT;
+  // collect all time points that achieve max earnings
+  const optimalTimes = [];
+  for (let t = 0; t <= days; t++) {
+    if (dp[t] === maxEarnings) {
+      optimalTimes.push(t);
+    }
+  }
+
+  // reconstruct all unique building combinations
+  const allSolutions = new Set();
+
+  function backtrack(t, counts) {
+    if (paths[t].length === 0) {
+      // reached base case, save this combination
+      const key = `T: ${counts.T} P: ${counts.P} C: ${counts.C}`;
+      allSolutions.add(key);
+      return;
+    }
+
+    for (const { prevT, building } of paths[t]) {
+      counts[building.type]++;
+      backtrack(prevT, counts);
+      counts[building.type]--;
+    }
+  }
+
+  // explore all paths from all optimal time points
+  for (const t of optimalTimes) {
+    backtrack(t, { T: 0, P: 0, C: 0 });
   }
 
   return {
-    buildings: buildingCount,
-    totalEarnings: dp[bestT],
+    earnings: maxEarnings,
+    solutions: Array.from(allSolutions).sort(),
   };
 }
 
-// quick sanity checks
-console.log("13 days:", maxProfit(13));
-// T built on day 5 earns 8*1500 = 12000, second T on day 10 earns 3*1500 = 4500 → 16500
-
-console.log("0 days:", maxProfit(0));
-
-console.log("4 days:", maxProfit(4));
-// not enough time to earn anything useful
-
-console.log("5 days:", maxProfit(5));
-// P finishes day 4, earns 1*1000 = 1000
-
-console.log("10 days:", maxProfit(10));
-// T on day 5 earns 5*1500=7500, P on day 9 earns 1*1000=1000 → 8500
-
-console.log("20 days:", maxProfit(20));
+// Simple test cases
+console.log("Test n=7:", maxProfit(7));
+console.log("\nTest n=8:", maxProfit(8));
+console.log("\nTest n=13:", maxProfit(13));
+console.log("\nTest n=49:", maxProfit(49));
