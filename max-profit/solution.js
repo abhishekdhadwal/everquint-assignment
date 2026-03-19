@@ -19,7 +19,7 @@ function maxProfit(days) {
   // track all possible ways to reach each state with max earnings
   const paths = new Array(days + 1).fill(null).map(() => []);
 
-  for (let t = 1; t <= days; t++) {
+  for (let t = 1; t < days; t++) {
     for (const b of buildings) {
       if (t < b.buildTime) continue;
 
